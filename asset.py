@@ -4,8 +4,6 @@ import numpy as np
 from order_management.order import Order
 
 
-from utils import Token
-
 class Asset(Order):
     
     def __init__(self, symbol, quantity, amount):

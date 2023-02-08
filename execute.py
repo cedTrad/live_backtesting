@@ -1,5 +1,4 @@
 from asset import Asset
-from trade import Trade
 
 from risk.risk_strategy import CPPI
 from strategy.signal import Signal
