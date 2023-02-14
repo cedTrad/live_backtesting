@@ -8,7 +8,6 @@ import zmq
 
 from asset import Asset
 from execute import AssetObj
-from trade import Trade
 
 from data.journal import Journal
 from risk.risk_strategy import CPPI
