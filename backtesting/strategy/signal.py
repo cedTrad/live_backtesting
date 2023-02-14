@@ -30,6 +30,7 @@ class Signal():
         signal = self.strategy(self.data)
         positionSide = signal.momentum(bar)
         #positionSide = signal.SAR(bar)
+        #positionSide = signal.RSI(bar, up = 0.8, down = 0.2)
         
         if positionSide == "LONG":
             self.side["LONG"] = True

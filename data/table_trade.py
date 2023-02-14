@@ -15,7 +15,6 @@ class Trades(Base):
     amount = Column(Float)
     quantity = Column(Float)
     value = Column(Float)
-    condition = Column(Float)
     returns = Column(Float)
     cum_ret_per_trade = Column(Float)
     
@@ -30,7 +29,6 @@ class Trades(Base):
         self.amount = add["amount"]
         self.quantity = add["quantity"]
         self.value = add["value"]
-        self.condition = add["condition"]
         self.returns = add["returns"]
         self.cum_ret_per_trade = add["cum_ret_per_trade"]
         

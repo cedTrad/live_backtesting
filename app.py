@@ -8,10 +8,14 @@ import zmq
 
 from asset import Asset
 from execute import AssetObj
+from portfolio import Portfolio
+
+from strategy.signal import Signal
+
+from risk_management.risk_strategy import CPPI
+from risk_management.money_management import Money_management
 
 from data.journal import Journal
-from risk.risk_strategy import CPPI
-from strategy.signal import Signal
 
 
 class App:
@@ -19,6 +23,8 @@ class App:
     def __init__(self, symbols):
         self.symbols = symbols
         self.trade_id = 0
+        
+        self.portfolio = Portfolio(symbols = symbols)
         
         self.data_1 = pd.DataFrame()
         self.data_2 = pd.DataFrame()
@@ -42,10 +48,28 @@ class App:
             'high':float(high), 'close':float(close), 'volume':float(volume)}
         return date, d
     
+    
     def preprocessing(self, data):
         data['returns'] = data['close'].pct_change()
         data['log_returns'] = np.log(data['close']/data['close'].shift(1))
         data['cum_ret'] = data['log_returns'].cumsum().apply(np.exp)
+        
+    
+    def config_asset(self, symbol, initial_amount, risky_amount, stopLoss, takeProfit, leverage = 1):
+        SIGNAL = Signal(symbol)
+        SIGNAL.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
+        
+        money_m = Money_management(symbol = symbol)
+        money_m.config(risky_amount = risky_amount, stopLoss = stopLoss, takeProfit = takeProfit, leverage = leverage)
+        
+        asset = AssetObj(symbol = symbol, amount = initial_amount, signal = SIGNAL)
+        return asset, money_m
+    
+    
+    def on(self, asset, date, price, data, symbol):
+        asset.signal.position(data)
+        asset.execute(date, price)
+        print("- ",symbol)
         
     
     def run(self):
@@ -60,22 +84,15 @@ class App:
         socket_2 = self.connect_server(symbol = SYMBOL_2)
         socket_3 = self.connect_server(symbol = SYMBOL_3)
         
-        #       Signal
-        SIGNAL_1 = Signal(SYMBOL_1)
-        SIGNAL_1.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
-        
-        SIGNAL_2 = Signal(SYMBOL_2)
-        SIGNAL_2.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
-        
-        SIGNAL_3 = Signal(SYMBOL_3)
-        SIGNAL_3.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
-        
-        #       Object
-        self.asset_1 = AssetObj(symbol = SYMBOL_1, quantity = 0, amount = 100, signal = SIGNAL_1)
-        self.asset_2 = AssetObj(symbol = SYMBOL_2, quantity = 0, amount = 100, signal = SIGNAL_2)
-        self.asset_3 = AssetObj(symbol = SYMBOL_3, quantity = 0, amount = 100, signal = SIGNAL_3)
+        self.asset_1 , self.money_m_1 =self.config_asset(symbol = SYMBOL_1, initial_amount = 100,
+                                                         risky_amount = 100, stopLoss = 0.01, takeProfit = 0.05)
+        self.asset_2 , self.money_m_2 =self.config_asset(symbol = SYMBOL_2, initial_amount = 100,
+                                                         risky_amount = 100, stopLoss = 0.01, takeProfit = 0.05)
+        self.asset_3 , self.money_m_3 =self.config_asset(symbol = SYMBOL_3, initial_amount = 100,
+                                                         risky_amount = 100, stopLoss = 0.01, takeProfit = 0.05)
         
         self.my_asset_obj = [self.asset_1, self.asset_2, self.asset_3]
+        
         
         print('wait ...')
         while True:
@@ -99,11 +116,15 @@ class App:
             )
             self.preprocessing(data = self.data_3)
             
+            price_1 = data_1["close"]
+            price_2 = data_2["close"]
+            price_3 = data_3["close"]
             
             #   Run
-            price_1 = data_1["close"]
-            self.asset_1.signal.position(self.data_1)
-            self.asset_1.execute(date_1, price_1, c = self.data_1['momentum'].iloc[-1])
-            print("-btc")
+            self.on(asset = self.asset_1, date = date_1, price = price_1, data = self.data_1, symbol = SYMBOL_1)
+            self.on(asset = self.asset_2, date = date_2, price = price_2, data = self.data_2, symbol = SYMBOL_2)
+            self.on(asset = self.asset_3, date = date_3, price = price_3, data = self.data_3, symbol = SYMBOL_3)
             
+            # Update
+            self.portfolio.update_account(assetObjs = self.my_asset_obj)
             

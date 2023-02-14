@@ -6,12 +6,15 @@ from order_management.order import Order
 
 class Asset(Order):
     
-    def __init__(self, symbol, quantity, amount):
+    def __init__(self, symbol, amount):
         
-        Order.__init__(self, quantity, amount)
+        Order.__init__(self, amount)
         
         self.symbol = symbol
         self.position = 0
+        self.leverage = 0
+        
+        #self.value = 0
         
     
     def update(self, price):

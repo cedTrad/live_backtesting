@@ -4,8 +4,8 @@ import numpy as np
 
 class Order:
     
-    def __init__(self, quantity, amount):
-        self.quantity = quantity
+    def __init__(self, amount):
+        self.quantity = 0
         self.amount = amount
     
     def convert(self, price, amount = None, quantity = None):

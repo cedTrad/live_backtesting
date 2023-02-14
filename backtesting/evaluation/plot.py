@@ -24,6 +24,8 @@ def plot_candle(fig, col, row, data):
         ),
         col = col, row = row
     )
+    fig = fig.update_xaxes(rangeslider_visible=False)
+
 
 def add_line(fig, col, row, data, name, color = None):
     fig.add_trace(
@@ -48,6 +50,8 @@ def add_scatter(fig, col, row, data, name, color):
         col = col, row = row
     )
 
+def add_hline(fig, y, col, row, color):
+    fig.add_hline(y = y , col = col, row = row, line_color = color)
 
 # signal point
 def signal_point(fig, col, row, x, y, name, marker, size = 10):

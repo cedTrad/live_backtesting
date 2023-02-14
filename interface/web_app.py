@@ -12,12 +12,18 @@ import plotly.graph_objects as go
 
 from dash.dependencies import Input, Output
 
-
 from layout import layout_0, layout_1
-from init import Data, merge
 
 
-symbol = "BTC"
+PATH = "C:/Users/cc/Desktop/CedAlgo/AlgoTrading/data/trade/"
+
+SYMBOL = "BTC"
+NAME = 'BTCUSDT_LS'
+
+def get_data(name, table, path = PATH):
+    engine = sqlalchemy.create_engine(f'sqlite:///'+path+name+'.db')
+    data = pd.read_sql(table, engine)
+    return data
 
 
 app = dash.Dash(__name__)
@@ -51,10 +57,10 @@ def update_timestamp(interval):
     Input("interval-component", "n_intervals")
 )
 def update_graph(n):
-    Trades = merge("Trades", "TradesMeta")
-    Trades_reduit = merge("Reduit", "ReduitMeta")
-    Long = merge("Long", "LongMeta")
-    Short = merge("Short", "ShortMeta")
+    Trades = get_data(name = NAME, table = "DataLS")
+    Trades_reduit = get_data(name = NAME, table = "LS_reduit")
+    Long = get_data(name = NAME, table = "LS_long")
+    Short = get_data(name = NAME, table = "LS_short")
     
     trades_line = go.Scatter(
         x = Trades["date"],

@@ -40,7 +40,7 @@ class Journal:
         self.quantity = quantity
         self.value = value
         
-    def journal_LS(self, trade_id, position, status, close, condition):
+    def journal_LS(self, trade_id, position, status, close):
         
         self.trade_id = trade_id
         
@@ -55,7 +55,6 @@ class Journal:
                'amount' : self.amount, 
                'quantity' : self.quantity, 
                'value' : self.value,
-               'condition' : condition
                }
         
         self.dataBlock = self.dataBlock.append(

@@ -81,9 +81,7 @@ class AssetObj:
         else:
             self.saveLS(trade_id = self.trade_id, status = "-")
         
-        
-    
-        
+             
 
 class App:
     
@@ -146,7 +144,7 @@ class App:
         
         #       Signal
         SIGNAL_1 = Signal(self.data_1)
-        SIGNAL_1.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
+        SIGNAL_1.set_params(MOMENTUM = 3, RSI = 4, BB = (7, 3), DAY_UP = 7)
         
         SIGNAL_2 = Signal(self.data_2)
         SIGNAL_2.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
@@ -260,10 +258,16 @@ class App:
         
         # Add RSI
         add_line(fig, col = 1, row = 3, data = data, name = "rsi")
+        add_hline(fig, y = 80, col = 1, row = 3, color = 'red')
+        add_hline(fig, y = 20, col = 1, row = 3, color = 'green')
+        add_hline(fig, y = 0, col = 1, row = 3, color = 'black')
         
         # Update params
-        #fig.update_layout(xaxis_rangeslider_visible=False)
-        #fig.update(layout_xaxis_rangeslider_visible=False)
+        fig.update_layout(
+            {
+                'xaxis': {'rangeslider' : {'visible' : False}}
+            }
+        )
         
         
         signal_point(fig = fig, col = 1, row = 2, x = open_long.index, y = open_long,

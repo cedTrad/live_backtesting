@@ -26,7 +26,14 @@ class Strategy:
             return "LONG"
         elif self.data["sar_down"].iloc[bar] > 0:
             return "SHORT"
-        
+    
+    
+    def RSI(self, bar, up, down):
+        if self.data["rsi"].iloc[bar] > up:
+            return "LONG"
+        elif self.data["rsi"].iloc[bar] < down:
+            return "SHORT"    
+    
     
     def tripleMA(self, bar):
         ""
@@ -34,11 +41,10 @@ class Strategy:
     def tripleEMA(self, bar):
         ""
         
-
-    def RSI(self):
+        
+    
+    def momentum_rsi(self, bar):
         ""
-        
-        
     
     
     
