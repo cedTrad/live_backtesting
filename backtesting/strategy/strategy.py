@@ -35,6 +35,13 @@ class Strategy:
             return "SHORT"    
     
     
+    def n_day_up(self, bar, up, down):
+        if self.data["n_day_up"].iloc[bar] > up:
+            return "SHORT"
+        elif self.data["n_day_up"].iloc[bar] < down:
+            return "LONG"
+    
+    
     def tripleMA(self, bar):
         ""
         

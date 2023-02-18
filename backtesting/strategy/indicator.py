@@ -81,3 +81,9 @@ def sar(data, step = 0.2, max_step = 0.2):
     
     return SAR.psar(), SAR.psar_up(), SAR.psar_down()
 
+
+def macd(data, slow , fast, signal):
+    MACD = ta.trend.MACD(close = data.close , window_slow = slow, window_fast = fast,
+                         window_sign = signal)
+    return MACD.macd() , MACD.macd_diff(), MACD.macd_signal()
+    

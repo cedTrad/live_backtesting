@@ -11,7 +11,13 @@ def subplots(nb_rows , nb_cols, row_heights = None, column_widths = None, vertic
     
     fig = make_subplots(rows = nb_rows, cols = nb_cols, shared_xaxes = True, shared_yaxes = False,
                         row_heights = row_heights, column_widths= column_widths,
-                        vertical_spacing = vertical_spacing, horizontal_spacing = horizontal_spacing)
+                        vertical_spacing = vertical_spacing, horizontal_spacing = horizontal_spacing,
+                         specs = [
+                             [{"secondary_y": True}],
+                             [{"secondary_y": True}],
+                             [{"secondary_y": True}]
+                           ]
+                         )
     return fig
 
 
@@ -25,6 +31,19 @@ def plot_candle(fig, col, row, data):
         col = col, row = row
     )
     fig = fig.update_xaxes(rangeslider_visible=False)
+
+
+def plot_second_y(fig, col, row, data):
+    fig.add_trace(
+        go.Scatter(
+            x = data.index,
+            y = data['position'],
+            name = 'position',
+            yaxis="y2"
+        ),
+        col = col, row = row,
+        secondary_y=True,
+    )
 
 
 def add_line(fig, col, row, data, name, color = None):
@@ -50,8 +69,10 @@ def add_scatter(fig, col, row, data, name, color):
         col = col, row = row
     )
 
+
 def add_hline(fig, y, col, row, color):
     fig.add_hline(y = y , col = col, row = row, line_color = color)
+
 
 # signal point
 def signal_point(fig, col, row, x, y, name, marker, size = 10):
@@ -163,3 +184,64 @@ def plot_return(fig, col, row, dataLS, LS_reduit, LS_long, LS_short):
         col = 1, row = 1
     )
     
+    
+
+def plot_macd(fig, row, col):
+    fig.append_trace(
+        go.Scatter(
+            x = data.index , y = data.macd,
+            line = {'color':'black'},
+            name = "macd"
+        ),
+        row = row, col = col
+    )
+    
+    fig.append_trace(
+        go.Scatter(
+            x = data.index , y = data.macd_signal,
+            line = {'color':'green'},
+            name = "macd signal"
+        ),
+        row = row, col = col
+    )
+    
+    fig.append_trace(
+        go.Scatter(
+            x = data.index , y = data.macd_diff,
+            #line = {'color':'#000000'},
+            name = "macd_diff"
+        ),
+        row = row, col = col
+    )
+    
+    colors = np.where(data['macd_diff'] < 0, 'red', 'green')
+    fig.add_trace(
+        go.Bar
+        (
+            x = data.index ,y = data.macd_diff,
+            name="histogramme",
+            marker_color = colors
+        ),
+        row = row, col = col
+    )
+    
+
+def plot_stochastic(data, col, row):
+    fig.append_trace(
+        go.Scatter(
+            x = data.index , y = data.K,
+            line = {'color':'#ff9900'},
+            name = "Fast"
+        ),
+        row = row, col = col
+    )
+    
+    
+    fig.append_trace(
+        go.Scatter(
+            x = data.index , y = data.D,
+            line = {'color':'#000000'},
+            name = "Slow"
+        ),
+        row = row, col = col
+    )

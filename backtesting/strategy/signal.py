@@ -43,7 +43,15 @@ class Signal():
         else:
             self.side["SHORT"] = False
             self.side["LONG"] = False
-
-
+            
+            
+    def score(self, bar):
+        signal = self.strategy(self.data)
+        momentum = signal.momentum(bar)
+        sar = signal.SAR(bar)
+        rsi = signal.RSI(bar)
+        
+        
+        
 
 

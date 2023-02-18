@@ -214,6 +214,8 @@ class App:
         self.p_data["p_returns"] = self.p_data[self.symbols[0]+"_returns"]*weights[0] + self.p_data[self.symbols[1]+"_returns"]*weights[1] + self.p_data[self.symbols[2]+"_returns"]*weights[2]
         self.p_data["cum_p_ret"] = (self.p_data["p_returns"] + 1).cumprod()
     
+    
+    
     def my_portfolio(self):
         ""
         # Portfolio returns
@@ -228,10 +230,11 @@ class App:
         data = self.data[symbol]
         open_long = LS_long.loc[LS_long["status"]=="open_long"]["price"]
         close_long = LS_long.loc[LS_long["status"]=="close_long"]["price"]
+        pnl_long = LS_long.loc[LS_long["status"]=="close_long"]["returns"]
         
         open_short = LS_short.loc[LS_short["status"]=="open_short"]["price"]
         close_short = LS_short.loc[LS_short["status"]=="close_short"]["price"]
-        
+        pnl_short = LS_short.loc[LS_short["status"]=="close_short"]["returns"]
         
         open_long_cr = LS_long.loc[LS_long["status"]=="open_long"]["cum_ret"]
         close_long_cr = LS_long.loc[LS_long["status"]=="close_long"]["cum_ret"]
@@ -265,7 +268,7 @@ class App:
         # Update params
         fig.update_layout(
             {
-                'xaxis': {'rangeslider' : {'visible' : False}}
+                'xaxis': {'rangeslider' : {'visible' : False}},
             }
         )
         
@@ -287,10 +290,22 @@ class App:
         for xo, x1 ,yo, y1 in zip(open_short_cr.index, close_short_cr.index, open_short_cr, close_short_cr):
             color_returns(fig = fig, col = 1, row = 1, status = "short", x = (xo, x1), color="red", opacity=0.05)
         
-        for xo, x1 ,yo, y1 in zip(open_long.index, close_long.index, open_long, close_long):
-            color_trades(fig = fig, col = 1, row = 2, status = "long", x = (xo, x1), y = (yo, y1), color="green", opacity=0.1)
-        for xo, x1 ,yo, y1 in zip(open_short.index, close_short.index, open_short, close_short):
-            color_trades(fig = fig, col = 1, row = 2, status = "short", x = (xo, x1), y = (yo, y1), color="red", opacity=0.1)
+        
+        for xo, x1 ,yo, y1, pnl in zip(open_long.index, close_long.index, open_long, close_long, pnl_long):
+            if pnl > 0:
+                color_trades(fig = fig, col = 1, row = 2, status = "long", x = (xo, x1), y = (yo, y1), color="green", opacity=0.1)
+            elif pnl < 0:
+                color_trades(fig = fig, col = 1, row = 2, status = "long", x = (xo, x1), y = (yo, y1), color="red", opacity=0.1)
+                
+        for xo, x1 ,yo, y1, pnl in zip(open_short.index, close_short.index, open_short, close_short, pnl_short):
+            if pnl > 0:
+                color_trades(fig = fig, col = 1, row = 2, status = "short", x = (xo, x1), y = (yo, y1), color="green", opacity=0.1)
+            elif pnl < 0:
+                color_trades(fig = fig, col = 1, row = 2, status = "short", x = (xo, x1), y = (yo, y1), color="red", opacity=0.1)
+        
+        # Secondary axis:
+        plot_second_y(fig = fig, col = 1, row = 2, data = dataLS)
+        plot_second_y(fig = fig, col = 1, row = 1, data = dataLS)
         
         fig.update_layout(height = 1000 , width =1500)
         fig.show()
