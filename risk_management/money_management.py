@@ -2,12 +2,14 @@ import pandas
 
 class Money_management:
     
-    def __init__(self, symbol):
+    def __init__(self, symbol, amount):
         self.symbol = symbol
+        self.amount = amount
         
         
     def config(self, risky_amount, stopLoss, takeProfit, leverage):
         self.risky_amount = risky_amount
+        self.safe_amount = self.amount - self.risky_amount
         self.stopLoss = stopLoss
         self.takeProfit = takeProfit
         self.leverage = leverage

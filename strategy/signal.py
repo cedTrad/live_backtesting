@@ -21,11 +21,11 @@ class Signal():
         return data
     
     
-    def set_params(self, MOMENTUM : int, RSI : int, BB : tuple, DAY_UP : int):
-        self.m = MOMENTUM
-        self.rsi_p = RSI
-        self.b_b_p = BB
-        self.n_day_up_p = DAY_UP
+    def set_params(self, momentum : int, rsi : int, bb : tuple, day_up : int):
+        self.m = momentum
+        self.rsi_p = rsi
+        self.b_b_p = bb
+        self.n_day_up_p = day_up
         
         
     

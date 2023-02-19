@@ -265,6 +265,9 @@ class App:
         add_hline(fig, y = 20, col = 1, row = 3, color = 'green')
         add_hline(fig, y = 0, col = 1, row = 3, color = 'black')
         
+        # Add n day up
+        add_line(fig, col = 1, row = 3, data = data, name = 'n_day_up')
+        
         # Update params
         fig.update_layout(
             {

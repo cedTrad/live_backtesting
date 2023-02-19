@@ -10,6 +10,8 @@ class Signal():
         self.data = data
         self.side = {"LONG" : False, "SHORT" : False}
         self.strategy = Strategy
+        self.score_long = 0
+        self.score_short = 0
     
     def preprocessing(self):        
         self.data['momentum'] = self.data['log_return'].rolling(self.m).mean()
@@ -17,6 +19,7 @@ class Signal():
         self.data["rsi"] = rsi(self.data, period = self.rsi_p)
         self.data["sar"], self.data["sar_up"], self.data["sar_down"] = sar(self.data)
         self.data["n_day_up"] = n_day_up(self.data, period = self.n_day_up_p)
+    
     
     def set_params(self, MOMENTUM : int, RSI : int, BB : tuple, DAY_UP : int):
         self.m = MOMENTUM
@@ -45,11 +48,17 @@ class Signal():
             self.side["LONG"] = False
             
             
-    def score(self, bar):
+    def s_score(self, bar):
         signal = self.strategy(self.data)
         momentum = signal.momentum(bar)
         sar = signal.SAR(bar)
         rsi = signal.RSI(bar)
+        
+        if momentum == "LONG":
+            self.score_long +=1
+        elif sar == "LONG":
+            self.score_long +=1
+        
         
         
         

@@ -4,15 +4,18 @@ from risk_management.risk_strategy import CPPI
 from strategy.signal import Signal
 from asset import Asset
 
+from risk_management.money_management import Money_management
+
 from data.journal import Journal
 
 
 class AssetObj:
     
-    def __init__(self, symbol, amount, signal, risk = None):
+    def __init__(self, symbol, amount, signal, money_management, risk = None):
         self.asset = Asset(symbol = symbol, amount = amount)
         self.journal = Journal(symbol)
         self.signal = signal
+        self.money_manag = money_management
         self.risk = risk
         self.trade_id = 0
         
@@ -23,6 +26,7 @@ class AssetObj:
         self.journal.journal_LS(trade_id = trade_id, status = status, close = close,
                                 position = self.asset.position)
         #self.risk.update(date, price)
+        
         
     def long(self, price, quantity = 0):
         "" 

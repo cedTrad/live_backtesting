@@ -17,6 +17,7 @@ from risk_management.money_management import Money_management
 
 from data.journal import Journal
 
+from utils import Config
 
 class App:
     
@@ -54,19 +55,21 @@ class App:
         data['log_returns'] = np.log(data['close']/data['close'].shift(1))
         data['cum_ret'] = data['log_returns'].cumsum().apply(np.exp)
         
+        
     
     def config_asset(self, symbol, initial_amount, risky_amount, stopLoss, takeProfit, leverage = 1):
         SIGNAL = Signal(symbol)
         SIGNAL.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
         
-        money_m = Money_management(symbol = symbol)
+        money_m = Money_management(symbol = symbol, amount = initial_amount)
         money_m.config(risky_amount = risky_amount, stopLoss = stopLoss, takeProfit = takeProfit, leverage = leverage)
         
         asset = AssetObj(symbol = symbol, amount = initial_amount, signal = SIGNAL)
         return asset, money_m
     
     
-    def on(self, asset, date, price, data, symbol):
+    
+    def execute(self, asset, date, price, data, symbol):
         asset.signal.position(data)
         asset.execute(date, price)
         print("- ",symbol)
@@ -120,11 +123,13 @@ class App:
             price_2 = data_2["close"]
             price_3 = data_3["close"]
             
+            
             #   Run
-            self.on(asset = self.asset_1, date = date_1, price = price_1, data = self.data_1, symbol = SYMBOL_1)
-            self.on(asset = self.asset_2, date = date_2, price = price_2, data = self.data_2, symbol = SYMBOL_2)
-            self.on(asset = self.asset_3, date = date_3, price = price_3, data = self.data_3, symbol = SYMBOL_3)
+            self.execute(asset = self.asset_1, date = date_1, price = price_1, data = self.data_1, symbol = SYMBOL_1)
+            self.execute(asset = self.asset_2, date = date_2, price = price_2, data = self.data_2, symbol = SYMBOL_2)
+            self.execute(asset = self.asset_3, date = date_3, price = price_3, data = self.data_3, symbol = SYMBOL_3)
             
             # Update
             self.portfolio.update_account(assetObjs = self.my_asset_obj)
             
+
