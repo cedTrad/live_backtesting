@@ -10,6 +10,7 @@ from .preprocessing import Preprocessing
 
 
 from .table_trade import Trades
+from .table_data import Data
 from .base import Base
 
 class Journal:
@@ -21,7 +22,8 @@ class Journal:
         self.dataLS = pd.DataFrame()
         
         self.path = "C:/Users/cc/Desktop/CedAlgo/AlgoTrading/data/"
-        self.engineLS = self.engine(folder = "trade", symbol = self.symbol, nature="LS")
+        self.engineLS = self.engine(folder = "trade", symbol = symbol, nature="LS")
+        self.engine_data = self.engine(folder = "data", symbol = symbol, nature="raw")
         
 
     def engine(self, symbol, folder, nature = ""):
@@ -33,19 +35,38 @@ class Journal:
         return engine
     
     
+    
     def update(self, date, price, amount, quantity, value):
         self.date = date
         self.price = price
         self.amount = amount
         self.quantity = quantity
         self.value = value
+    
+    
+    
+    def journal_data(self, data, date):
+        add = data
+        add['time'] = date
         
+        # -------   database    ------
+        Base.metadata.create_all(self.engine_data)
+        Session = sessionmaker(bind = self.engine_data)
+        session = Session()
+        
+        data_i = Data(add)
+        
+        session.add(data_i)
+        session.commit()
+        session.close()
+        
+        
+    
     def journal_LS(self, trade_id, position, status, close):
         
         self.trade_id = trade_id
         
         key = str(uuid.uuid1())
-        
         add = {"key" : key, 
                'date' : self.date, 
                'trade_id' : self.trade_id, 

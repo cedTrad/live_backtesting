@@ -10,7 +10,7 @@ layout_0 = html.Div([
                     [
                     html.Div([
                         dcc.Slider(min = 0.5, max = 5,
-                                step = 0.5, value = 1,
+                                step = 0.5, value = 10,
                                 id = "interval-refresh")
                     ],
                             style = {"width" : "20%"}),
@@ -23,44 +23,35 @@ layout_0 = html.Div([
                     ),
                 ]
                          ),
-                
-                html.Div([
-                    
-                    html.Div([
-                        dcc.Graph(id = 'current_trade')
-                    ],
-                             style = {'display' : 'inline-block', 'width' : '50%'}
-                             ),
-                    
-                    html.Div([
-                        dcc.Graph(id = "cppi")
-                    ],
-                             style = {'display' : 'inline-block', 'width' : '50%'}
-                             )
-                ],
-                        style = {'display' : 'inline-block', 'width' : '60%'}),
-                
-                html.Div([
-                    html.H3("Current trade info"),
-                    html.Br(),
-                    html.H4("Entry"),
-                    html.Div(id = "price"),
-                    html.Div(id = "amount"),
-                    html.Div(id = "units"),
-                    html.Br(),
-                    html.H4("Current"),
-                    html.Div(id = "price_c"),
-                    html.Div(id = "amount_c"),
-                    html.Div(id = "cum_ret")
-                ],
-                        style = {'display' : 'inline-block', 'width' : '40%'})
-            ]
-                    )
+            ])
 
-layout_1 = html.Div([
+layout_return = html.Div([
                 html.Br(),
-                dcc.Graph(id = "main")
-            ]
-                    )
+                dcc.Graph(id = "return")
+            ],
+                        style = {'display' : 'inline-block', 'width' : '100%'}
+                        )
+
+layout_candle = html.Div([
+        html.Br(),
+        dcc.Graph(id = "candle")
+],
+                         style = {'display' : 'inline-block', 'width' : '100%'}
+                         )
+
+
+layout_symbol_1 = html.Div([])
+
+layout_symbol_2 = html.Div([])
+
+layout_symbol_3 = html.Div([])
+
+layout_portfolio = html.Div([])
+
+layout_cppi = html.Div([])
+
+layout_recovery = html.Div([])
+
+layout_table = html.Div([])
 
 

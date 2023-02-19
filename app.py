@@ -38,8 +38,7 @@ class App:
         socket.connect('tcp://127.0.0.1:8080')
         socket.setsockopt_string(zmq.SUBSCRIBE, symbol)
         return socket
-    
-    
+      
     def get_data(self, socket):
         data = socket.recv_string()
         _, date , opEn, high , low, close, volume, stop = data.split()
@@ -49,23 +48,23 @@ class App:
             'high':float(high), 'close':float(close), 'volume':float(volume)}
         return date, d
     
-    
     def preprocessing(self, data):
         data['returns'] = data['close'].pct_change()
         data['log_returns'] = np.log(data['close']/data['close'].shift(1))
         data['cum_ret'] = data['log_returns'].cumsum().apply(np.exp)
         
         
-    
     def config_asset(self, symbol, initial_amount, risky_amount, stopLoss, takeProfit, leverage = 1):
-        SIGNAL = Signal(symbol)
-        SIGNAL.set_params(MOMENTUM = 3, RSI = 7, BB = (7, 3), DAY_UP = 7)
+        signal = Signal(symbol)
+        signal.set_params(momentum = 3, rsi = 7, bb = (7, 3), day_up = 7)
         
-        money_m = Money_management(symbol = symbol, amount = initial_amount)
-        money_m.config(risky_amount = risky_amount, stopLoss = stopLoss, takeProfit = takeProfit, leverage = leverage)
+        money = Money_management(symbol = symbol, amount = initial_amount)
+        money.config(risky_amount = risky_amount, stopLoss = stopLoss, takeProfit = takeProfit, leverage = leverage)
         
-        asset = AssetObj(symbol = symbol, amount = initial_amount, signal = SIGNAL)
-        return asset, money_m
+        asset = AssetObj(symbol = symbol, amount = initial_amount, signal = signal,
+                         money_management = money)
+        
+        return asset
     
     
     
@@ -78,20 +77,28 @@ class App:
     def run(self):
         
         # INITIALISATION
-        
         SYMBOL_1 = self.symbols[0]
+        journal_1 = Journal(symbol = SYMBOL_1)
+        
         SYMBOL_2 = self.symbols[1]
+        journal_2 = Journal(symbol = SYMBOL_2)
+        
         SYMBOL_3 = self.symbols[2]
+        journal_3 = Journal(symbol = SYMBOL_3)
         
         socket_1 = self.connect_server(symbol = SYMBOL_1)
         socket_2 = self.connect_server(symbol = SYMBOL_2)
         socket_3 = self.connect_server(symbol = SYMBOL_3)
         
-        self.asset_1 , self.money_m_1 =self.config_asset(symbol = SYMBOL_1, initial_amount = 100,
+        
+        asset_1 = Config(symbol = SYMBOL_1, initial_amount = 100)
+        asset_1.strategy(momentum = 3, rsi = 4, bb = (7, 3), day_up = 5)
+        asset_1.money(risky_amount = 80, stopLoss = 0.1, takeProfit = 0.1, leverage = 1)
+        self.asset_1 = asset_1.done()
+        
+        self.asset_2 = self.config_asset(symbol = SYMBOL_2, initial_amount = 100,
                                                          risky_amount = 100, stopLoss = 0.01, takeProfit = 0.05)
-        self.asset_2 , self.money_m_2 =self.config_asset(symbol = SYMBOL_2, initial_amount = 100,
-                                                         risky_amount = 100, stopLoss = 0.01, takeProfit = 0.05)
-        self.asset_3 , self.money_m_3 =self.config_asset(symbol = SYMBOL_3, initial_amount = 100,
+        self.asset_3 = self.config_asset(symbol = SYMBOL_3, initial_amount = 100,
                                                          risky_amount = 100, stopLoss = 0.01, takeProfit = 0.05)
         
         self.my_asset_obj = [self.asset_1, self.asset_2, self.asset_3]
@@ -102,18 +109,21 @@ class App:
             
             #           load data
             date_1 , data_1 = self.get_data(socket_1)
+            journal_1.journal_data(data = data_1, date = date_1)
             self.data_1 = self.data_1.append(
                 pd.DataFrame(data = data_1, index = [date_1])
             )
             self.preprocessing(data = self.data_1)
             
             date_2 , data_2 = self.get_data(socket_2)
+            journal_2.journal_data(data = data_2, date = date_2)
             self.data_2 = self.data_2.append(
                 pd.DataFrame(data = data_2, index = [date_2])
             )
             self.preprocessing(data = self.data_2)
             
             date_3 , data_3 = self.get_data(socket_3)
+            journal_3.journal_data(data = data_3, date = date_3)
             self.data_3 = self.data_3.append(
                 pd.DataFrame(data = data_3, index = [date_3])
             )
@@ -132,4 +142,8 @@ class App:
             # Update
             self.portfolio.update_account(assetObjs = self.my_asset_obj)
             
+
+
+
+
 

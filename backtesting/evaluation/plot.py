@@ -26,7 +26,7 @@ def plot_candle(fig, col, row, data):
     fig.add_trace(
         go.Candlestick(
             x = data.index , open = data.open, close = data.close,
-            high = data.high, low = data.low, name = data.symbol[0]
+            high = data.high, low = data.low, name = data.symbol[0],
         ),
         col = col, row = row
     )
